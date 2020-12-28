@@ -11,9 +11,11 @@ import com.niklasarndt.awswatchdog.util.BuildInfo;
 import com.niklasarndt.awswatchdog.util.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -65,9 +67,9 @@ public class AwsWatcher implements Runnable {
 
     private void applyBucketWatch(String bucketName) {
         ListObjectsV2Result res = client.listObjectsV2(bucketName);
-        List<String> added = Collections.synchronizedList(res.getObjectSummaries()
+        List<S3ObjectSummary> added = Collections.synchronizedList(res.getObjectSummaries()
                 .stream().filter(i -> i.getLastModified().getTime() > lastCheck)
-                .map(S3ObjectSummary::getKey).collect(Collectors.toList()));
+                .collect(Collectors.toList()));
 
         logger.info("[{}] Found {} objects ({} added).", bucketName, res.getKeyCount(),
                 added.size());
@@ -79,7 +81,11 @@ public class AwsWatcher implements Runnable {
 
         StringBuilder body = new StringBuilder();
 
-        added.forEach(el -> body.append("<li>").append(el).append("</li>\n"));
+        SimpleDateFormat format = new SimpleDateFormat("MMMMM dd yyyy hh:mm:ss z",
+                Locale.US);
+
+        added.forEach(el -> body.append("<li>").append(el.getKey()).append(" (added: ")
+                .append(format.format(el.getLastModified())).append(")").append("</li>\n"));
 
         String subject = Configuration.require("MAIL_SUBJECT")
                 .replace("%amount%", added.size() + "")

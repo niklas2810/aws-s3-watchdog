@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+
+  watchdog:
+    image: niklas2810/aws-s3-watchdog
+    container_name: s3-watchdog
+    restart: on-failure
+    env_file:
+      - .env

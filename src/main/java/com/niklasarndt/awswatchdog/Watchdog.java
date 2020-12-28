@@ -37,7 +37,8 @@ public class Watchdog {
         executor = Executors.newScheduledThreadPool(1);
         watcher.setUp();
         int interval = Configuration.requireInt("POLLING_INTERVAL");
-        logger.info("Setting polling interval to {} seconds", interval);
+        logger.info("Setting polling interval to {} seconds (every {} minutes)", interval,
+                interval / 60);
 
         executor.scheduleAtFixedRate(watcher, 0, interval, TimeUnit.SECONDS);
 

@@ -4,13 +4,16 @@ import static com.niklasarndt.awswatchdog.util.Configuration.require;
 import static com.niklasarndt.awswatchdog.util.Configuration.requireInt;
 import org.simplejavamail.api.email.Email;
 import org.simplejavamail.api.email.EmailPopulatingBuilder;
+import org.simplejavamail.api.email.Recipient;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Arrays;
+import javax.mail.Message;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,7 +29,7 @@ public class MailService {
     private final String host;
     private final int port;
     private final String from;
-    private final String[] to;
+    private final Recipient[] to;
     private final String username;
     private final String password;
 
@@ -38,7 +41,13 @@ public class MailService {
         host = require("MAIL_HOST");
         port = requireInt("MAIL_PORT");
         from = require("MAIL_FROM");
-        to = require("MAIL_TO").split(",");
+        List<Recipient> recipients = new ArrayList<>();
+        String[] addresses = require("MAIL_TO").split(",");
+        for (String address : addresses) {
+            recipients.add(new Recipient(address, address,
+                    Message.RecipientType.TO));
+        }
+        to = recipients.toArray(new Recipient[0]);
         username = require("MAIL_USERNAME");
         password = require("MAIL_PASSWORD");
 
@@ -53,13 +62,10 @@ public class MailService {
     public void send(String subject, String message) {
         try {
             EmailPopulatingBuilder builder = EmailBuilder.startingBlank()
+                    .to(to)
                     .from("AWS S3 Watchdog", from)
                     .withSubject(subject).withHTMLText(message);
 
-            if (to.length < 2)
-                builder.to(to[0]);
-            else
-                builder.to(to[0], Arrays.copyOfRange(to, 1, to.length));
 
             send(builder.buildEmail(), true);
         } catch (Exception e) {

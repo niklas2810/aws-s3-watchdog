@@ -77,8 +77,6 @@ public class AwsWatcher implements Runnable {
         if (added.size() == 0)
             return;
 
-        logger.info("Building...");
-
         StringBuilder body = new StringBuilder();
 
         SimpleDateFormat format = new SimpleDateFormat("MMMMM dd yyyy hh:mm:ss z",

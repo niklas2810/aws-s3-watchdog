@@ -31,7 +31,7 @@ public class AwsWatcher implements Runnable {
 
     private AmazonS3 client;
     private String[] bucketFilter;
-    private long lastCheck = 0;
+    private long lastCheck = EnvHelper.DEBUG ? 0 : System.currentTimeMillis();
 
     public AwsWatcher(MailService mailer) {
         this.mailer = mailer;
@@ -136,9 +136,6 @@ public class AwsWatcher implements Runnable {
     public void run() {
         if (health != null)
             health.sendHeartbeat(HealthchecksClient.EventType.START);
-
-        if (this.lastCheck == 0 && !EnvHelper.DEBUG)
-            this.lastCheck = System.currentTimeMillis();
 
         logger.debug("[Routine] Refreshing buckets...");
 

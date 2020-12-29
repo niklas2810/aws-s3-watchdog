@@ -1,5 +1,5 @@
 <div style="width:100%;padding:0px;margin:0px" align="center">
-    <h1>AWS S3 Watchdog</h1>
+    <img src="https://socialify.git.ci/niklas2810/aws-s3-watchdog/image?description=1&font=Inter&language=1&owner=1&pattern=Circuit%20Board&theme=Dark" alt="aws-s3-watchdog" width="640" height="320" />
     <br>
     <a href="https://github.com/niklas2810/aws-s3-watchdog/actions">
     <img alt="GitHub Actions CI" src="https://img.shields.io/github/workflow/status/niklas2810/aws-s3-watchdog/Build%20Main%20Branch%20&%20Docker%20Image?logo=github&style=for-the-badge"/>

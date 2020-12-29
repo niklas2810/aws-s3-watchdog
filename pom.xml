@@ -6,7 +6,7 @@
 
     <groupId>com.nikasarndt</groupId>
     <artifactId>awswatchdog</artifactId>
-    <version>1.0</version>
+    <version>1.0.0</version>
 
     <name>AWS S3 Watchdog</name>
     <description>Receive an email as soon as an object is added/modified in an AWS S3 bucket.

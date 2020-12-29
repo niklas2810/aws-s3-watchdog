@@ -32,17 +32,11 @@ jobs:
           key: build-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             build-${{ runner.os }}-
+
       - name: 📦 Build package
         run: mvn clean package
 
-      - name: 🚀 Upload JAR
-        uses: actions/upload-artifact@v2
-        with:
-          name: jar-files
-          path: ./target/*.jar
-
   docker:
-    needs: build
     name: 🐳 Generate Docker Image
     runs-on: ubuntu-latest
 
@@ -50,24 +44,14 @@ jobs:
       - name: ⏬ Checkout code
         uses: actions/checkout@v2
 
-      - name: ⏬ Download pre-built .jar
-        uses: actions/download-artifact@v2
-        with:
-          name: jar-files
-          path: ./target
-
-      - name: 💽 Restore Docker cache
-        uses: actions/cache@v2
-        with:
-          path: /var/lib/docker/image
-          key: docker-${{ runner.os }}-${{ hashFiles('**/Dockerfile') }}
-          restore-keys: |
-            docker-${{ runner.os }}-
-
-      - name: 📦+⬆️ Build and push
-        uses: docker/build-push-action@v1
+      - name: 🔓 Login to Docker Hub
+        uses: docker/login-action@v1
         with:
           username: niklas2810
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: niklas2810/aws-s3-watchdog
-          tags: latest
+
+      - name: 📦+⬆️ Build and push
+        uses: docker/build-push-action@v2
+        with:
+          tags: niklas2810/aws-s3-watchdog:latest
+          push: true

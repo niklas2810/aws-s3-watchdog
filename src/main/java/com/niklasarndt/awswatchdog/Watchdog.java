@@ -48,10 +48,10 @@ public class Watchdog {
         logger.info("Setting polling interval to {} seconds (every {} minutes)", interval,
                 interval / 60);
 
-        boolean startImmediately = !EnvHelper.has("START_IMMEDIATELY")
-                || !EnvHelper.require("START_IMMEDIATELY").equals("false");
+        boolean initialDelay = !EnvHelper.has("INITIAL_DELAY")
+                || EnvHelper.require("INITIAL_DELAY").equals("true");
 
-        int delay = startImmediately ? 0 : calculateStartDelay(interval);
+        int delay = !initialDelay ? 0 : calculateStartDelay(interval);
         executor.scheduleAtFixedRate(watcher, delay, interval, TimeUnit.SECONDS);
 
     }

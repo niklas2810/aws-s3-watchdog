@@ -12,16 +12,16 @@ import com.niklasarndt.awswatchdog.util.EnvHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Created by Niklas on 2020/12/28.
  */
 public class AwsWatcher implements Runnable {
+
+    private static final SimpleDateFormat DATE_FORMAT =
+            new SimpleDateFormat("MMMMM dd yyyy HH:mm:ss z", Locale.US);
 
     private final MailService mailer;
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -76,13 +76,51 @@ public class AwsWatcher implements Runnable {
         if (added.size() == 0)
             return;
 
+        buildMail(bucketName, added);
+    }
+
+    private String generateListElement(S3ObjectSummary el) {
+        return "<li>" + el.getKey().substring(el.getKey().lastIndexOf("/") + 1) +
+                " (added: " +
+                DATE_FORMAT.format(el.getLastModified()) + ")" + "</li>\n";
+    }
+
+    private void buildMail(String bucketName, List<S3ObjectSummary> added) {
+        Map<String, List<S3ObjectSummary>> items = new TreeMap<>();
+
+        for (S3ObjectSummary item : added) {
+            String key = item.getKey();
+            if (!key.contains("/") || key.lastIndexOf("/") == key.length() - 1) {
+                items.put(key, new ArrayList<>());
+                continue;
+            }
+
+            String folder = key.substring(0, key.lastIndexOf("/") + 1);
+
+            if (items.containsKey(folder))
+                items.get(folder).add(item);
+            else
+                items.put(folder, new ArrayList<>(Collections.singletonList(item)));
+        }
+
+        items.forEach((key, value) ->
+                value.forEach(val -> System.out.println("\t" + val)));
+
         StringBuilder body = new StringBuilder();
 
-        SimpleDateFormat format = new SimpleDateFormat("MMMMM dd yyyy HH:mm:ss z",
-                Locale.US);
+        items.forEach((index, subelements) -> {
+            if (subelements.size() == 0)
+                return;
 
-        added.forEach(el -> body.append("<li>").append(el.getKey()).append(" (added: ")
-                .append(format.format(el.getLastModified())).append(")").append("</li>\n"));
+            body.append("<li>").append(index).append("<ul>\n");
+            subelements.forEach(el -> body.append(generateListElement(el)));
+            body.append("</ul></li>\n");
+        });
+
+        added.stream().filter(i -> !i.getKey().contains("/"))
+                .forEach(el -> body.append(generateListElement(el)));
+
+        body.append("</ul>\n");
 
         String subject = EnvHelper.require("MAIL_SUBJECT")
                 .replace("%amount%", added.size() + "")

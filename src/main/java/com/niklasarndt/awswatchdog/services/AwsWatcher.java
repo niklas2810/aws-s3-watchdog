@@ -79,7 +79,7 @@ public class AwsWatcher implements Runnable {
 
         StringBuilder body = new StringBuilder();
 
-        SimpleDateFormat format = new SimpleDateFormat("MMMMM dd yyyy hh:mm:ss z",
+        SimpleDateFormat format = new SimpleDateFormat("MMMMM dd yyyy HH:mm:ss z",
                 Locale.US);
 
         added.forEach(el -> body.append("<li>").append(el.getKey()).append(" (added: ")

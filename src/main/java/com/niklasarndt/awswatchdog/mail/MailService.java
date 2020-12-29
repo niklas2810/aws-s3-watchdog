@@ -2,6 +2,7 @@ package com.niklasarndt.awswatchdog.mail;
 
 import static com.niklasarndt.awswatchdog.util.EnvHelper.require;
 import static com.niklasarndt.awswatchdog.util.EnvHelper.requireInt;
+import com.niklasarndt.awswatchdog.util.NameConstants;
 import org.simplejavamail.api.email.Email;
 import org.simplejavamail.api.email.EmailPopulatingBuilder;
 import org.simplejavamail.api.email.Recipient;
@@ -55,7 +56,7 @@ public class MailService {
         try {
             EmailPopulatingBuilder builder = EmailBuilder.startingBlank()
                     .to(to)
-                    .from("AWS S3 Watchdog", from)
+                    .from(NameConstants.INSTANCE_NAME, from)
                     .withSubject(subject).withHTMLText(message);
 
 

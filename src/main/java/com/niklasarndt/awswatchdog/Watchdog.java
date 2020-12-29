@@ -2,6 +2,7 @@ package com.niklasarndt.awswatchdog;
 
 import com.niklasarndt.awswatchdog.mail.MailService;
 import com.niklasarndt.awswatchdog.services.AwsWatcher;
+import com.niklasarndt.awswatchdog.util.BuildConstants;
 import com.niklasarndt.awswatchdog.util.EnvHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +69,8 @@ public class Watchdog {
                 ZoneId.systemDefault());
         int res = (int) ((start - System.currentTimeMillis()) / 1000);
 
-        logger.info("Starting AWS S3 Watchdog at {} (in {} seconds)!",
-                startTime.toString(), res);
+        logger.info("Starting {} at {} (in {} seconds)!",
+                BuildConstants.NAME, startTime.toString(), res);
         return res;
     }
 }

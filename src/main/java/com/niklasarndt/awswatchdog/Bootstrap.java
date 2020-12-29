@@ -14,7 +14,8 @@ public class Bootstrap {
 
 
     public static void main(String[] args) {
-        logger.info("This is AWS S3 Watchdog v.{} (Build {})",
+        logger.info("This is {} v.{} (Build {})",
+                BuildConstants.NAME,
                 BuildConstants.VERSION, BuildConstants.TIMESTAMP);
 
         Watchdog service = new Watchdog();

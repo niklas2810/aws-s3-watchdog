@@ -1,7 +1,7 @@
 <div style="width:100%;padding:0px;margin:0px" align="center">
     <h1>AWS S3 Watchdog</h1>
     <br>
-    <a href="https://github.com/niklas2810/aws-s3-watchdog/tree/main/java">
+    <a href="https://github.com/niklas2810/aws-s3-watchdog/actions">
     <img alt="GitHub Actions CI" src="https://img.shields.io/github/workflow/status/niklas2810/aws-s3-watchdog/Build%20Main%20Branch%20&%20Docker%20Image?logo=github&style=for-the-badge"/>
     </a>
      <a href="https://app.codacy.com/gh/niklas2810/aws-s3-watchdog/dashboard">

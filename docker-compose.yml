@@ -6,5 +6,7 @@ services:
     image: niklas2810/aws-s3-watchdog
     container_name: s3-watchdog
     restart: on-failure
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
     env_file:
       - .env

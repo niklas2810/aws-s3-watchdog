@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.niklasarndt.awswatchdog.health.HealthchecksClient;
 import com.niklasarndt.awswatchdog.mail.MailService;
 import com.niklasarndt.awswatchdog.util.BuildConstants;
 import com.niklasarndt.awswatchdog.util.EnvHelper;
@@ -25,6 +26,8 @@ public class AwsWatcher implements Runnable {
 
     private final MailService mailer;
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final HealthchecksClient health = EnvHelper.has("HEALTHCHECKS_ID") ?
+            new HealthchecksClient() : null;
 
     private AmazonS3 client;
     private String[] bucketFilter;
@@ -32,6 +35,8 @@ public class AwsWatcher implements Runnable {
 
     public AwsWatcher(MailService mailer) {
         this.mailer = mailer;
+        if (health != null)
+            logger.info("Reporting to healthchecks.io has been set up!");
     }
 
     public void setUp() {
@@ -73,10 +78,8 @@ public class AwsWatcher implements Runnable {
         logger.info("[{}] Found {} objects ({} added).", bucketName, res.getKeyCount(),
                 added.size());
 
-        if (added.size() == 0)
-            return;
-
-        buildMail(bucketName, added);
+        if (added.size() > 0)
+            buildMail(bucketName, added);
     }
 
     private String generateListElement(S3ObjectSummary el) {
@@ -131,11 +134,15 @@ public class AwsWatcher implements Runnable {
 
     @Override
     public void run() {
+        if (health != null)
+            health.sendHeartbeat(HealthchecksClient.EventType.START);
+
         if (this.lastCheck == 0 && !EnvHelper.DEBUG)
             this.lastCheck = System.currentTimeMillis();
 
         logger.debug("[Routine] Refreshing buckets...");
 
+        boolean error = false;
         try {
             if (bucketFilter.length == 0)
                 client.listBuckets().forEach(i -> this.applyBucketWatch(i.getName()));
@@ -145,7 +152,13 @@ public class AwsWatcher implements Runnable {
                 }
         } catch (Exception e) {
             logger.error("Failed to request bucket objects", e);
+            error = true;
+            if (health != null)
+                health.sendHeartbeat(HealthchecksClient.EventType.FAIL);
         }
+
+        if (!error && health != null)
+            health.sendHeartbeat();
 
 
         this.lastCheck = System.currentTimeMillis();

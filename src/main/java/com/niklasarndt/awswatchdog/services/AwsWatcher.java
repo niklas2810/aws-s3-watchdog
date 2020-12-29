@@ -7,8 +7,8 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.niklasarndt.awswatchdog.mail.MailService;
-import com.niklasarndt.awswatchdog.util.BuildInfo;
-import com.niklasarndt.awswatchdog.util.Configuration;
+import com.niklasarndt.awswatchdog.util.BuildConstants;
+import com.niklasarndt.awswatchdog.util.EnvHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
@@ -35,10 +35,9 @@ public class AwsWatcher implements Runnable {
     }
 
     public void setUp() {
-        PropertiesFileProvider credentials = new PropertiesFileProvider();
-        Regions region = Regions.fromName(Configuration.require("AWS_REGION"));
-        this.bucketFilter = Configuration.has("AWS_BUCKETS") ?
-                Configuration.require("AWS_BUCKETS").split(",") : new String[0];
+        Regions region = Regions.fromName(EnvHelper.require("AWS_REGION"));
+        this.bucketFilter = EnvHelper.has("AWS_BUCKETS") ?
+                EnvHelper.require("AWS_BUCKETS").split(",") : new String[0];
 
         this.client = AmazonS3Client.builder()
                 .withCredentials(new PropertiesFileProvider()).withRegion(region).build();
@@ -85,19 +84,19 @@ public class AwsWatcher implements Runnable {
         added.forEach(el -> body.append("<li>").append(el.getKey()).append(" (added: ")
                 .append(format.format(el.getLastModified())).append(")").append("</li>\n"));
 
-        String subject = Configuration.require("MAIL_SUBJECT")
+        String subject = EnvHelper.require("MAIL_SUBJECT")
                 .replace("%amount%", added.size() + "")
                 .replace("%bucket%", bucketName);
 
-        String content = String.format(Constants.MAIL_TEXT, bucketName, added.size(),
-                body.toString(), BuildInfo.VERSION, BuildInfo.TIMESTAMP);
+        String content = String.format(MailConstants.MAIL_TEXT, bucketName, added.size(),
+                body.toString(), BuildConstants.VERSION, BuildConstants.TIMESTAMP);
 
         mailer.send(subject, content);
     }
 
     @Override
     public void run() {
-        if (this.lastCheck == 0 && !Configuration.DEBUG)
+        if (this.lastCheck == 0 && !EnvHelper.DEBUG)
             this.lastCheck = System.currentTimeMillis();
 
         logger.debug("[Routine] Refreshing buckets...");

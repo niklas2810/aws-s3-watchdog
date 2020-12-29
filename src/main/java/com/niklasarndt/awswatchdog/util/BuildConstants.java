@@ -8,7 +8,7 @@ import java.util.Properties;
 /**
  * Created by Niklas on 2020/07/25.
  */
-public class BuildInfo {
+public class BuildConstants {
 
     public static String NAME;
     public static String DESCRIPTION;
@@ -20,7 +20,7 @@ public class BuildInfo {
     static {
         try {
             Properties properties = new Properties();
-            properties.load(BuildInfo.class.getClassLoader()
+            properties.load(BuildConstants.class.getClassLoader()
                     .getResourceAsStream("build.properties"));
 
             NAME = properties.getProperty("build.name");
@@ -33,7 +33,7 @@ public class BuildInfo {
             e.printStackTrace();
         }
         //Set null fields to UNKNOWN
-        for (Field field : BuildInfo.class.getDeclaredFields()) {
+        for (Field field : BuildConstants.class.getDeclaredFields()) {
             try {
                 if (field.getType().isAssignableFrom(String.class)
                         && field.getModifiers() == (Modifier.PUBLIC | Modifier.STATIC)
@@ -46,6 +46,6 @@ public class BuildInfo {
         }
     }
 
-    private BuildInfo() {
+    private BuildConstants() {
     }
 }

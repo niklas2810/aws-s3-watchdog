@@ -6,7 +6,7 @@ import java.util.Optional;
 /**
  * Created by Niklas on 2020/12/25.
  */
-public class Configuration {
+public class EnvHelper {
 
     public static final boolean DEBUG = System.getenv("AWS_WATCHDOG_DEBUG") != null;
     private static final Dotenv dotenv = DEBUG ? Dotenv.configure().ignoreIfMissing().load() : null;
@@ -27,7 +27,7 @@ public class Configuration {
 
     public static String require(String key) {
         return get(key).orElseThrow(() ->
-                new IllegalStateException("Configuration value for key \""
+                new IllegalStateException("EnvHelper value for key \""
                         + key + "\" has not been set! This is a required value."));
     }
 
@@ -39,7 +39,7 @@ public class Configuration {
         try {
             return Integer.parseInt(require(key));
         } catch (NumberFormatException e) {
-            throw new IllegalStateException("Configuration value for key \""
+            throw new IllegalStateException("EnvHelper value for key \""
                     + key + "\" is present, but not an integer! This is a required number.", e);
         }
     }

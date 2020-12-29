@@ -1,7 +1,7 @@
 package com.niklasarndt.awswatchdog.mail;
 
-import static com.niklasarndt.awswatchdog.util.Configuration.require;
-import static com.niklasarndt.awswatchdog.util.Configuration.requireInt;
+import static com.niklasarndt.awswatchdog.util.EnvHelper.require;
+import static com.niklasarndt.awswatchdog.util.EnvHelper.requireInt;
 import org.simplejavamail.api.email.Email;
 import org.simplejavamail.api.email.EmailPopulatingBuilder;
 import org.simplejavamail.api.email.Recipient;
@@ -26,20 +26,14 @@ public class MailService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    private final String host;
-    private final int port;
     private final String from;
     private final Recipient[] to;
-    private final String username;
-    private final String password;
 
-    private boolean invalid = false;
-
-    private Mailer mailer;
+    private final Mailer mailer;
 
     public MailService() {
-        host = require("MAIL_HOST");
-        port = requireInt("MAIL_PORT");
+        String host = require("MAIL_HOST");
+        int port = requireInt("MAIL_PORT");
         from = require("MAIL_FROM");
         List<Recipient> recipients = new ArrayList<>();
         String[] addresses = require("MAIL_TO").split(",");
@@ -48,10 +42,8 @@ public class MailService {
                     Message.RecipientType.TO));
         }
         to = recipients.toArray(new Recipient[0]);
-        username = require("MAIL_USERNAME");
-        password = require("MAIL_PASSWORD");
-
-        if (invalid) return;
+        String username = require("MAIL_USERNAME");
+        String password = require("MAIL_PASSWORD");
 
         mailer = MailerBuilder.withSMTPServer(host, port, username, password)
                 .withTransportStrategy(TransportStrategy.SMTP_TLS).buildMailer();
@@ -75,7 +67,7 @@ public class MailService {
     }
 
     public void send(Email mail, boolean async) {
-        if (invalid || mailer == null) {
+        if (isInvalid()) {
             logger.warn("Trying to send mail with invalid mail configuration!");
             return;
         }
@@ -98,6 +90,6 @@ public class MailService {
     }
 
     public boolean isInvalid() {
-        return invalid;
+        return mailer == null;
     }
 }

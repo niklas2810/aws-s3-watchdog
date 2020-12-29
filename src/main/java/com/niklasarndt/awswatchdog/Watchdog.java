@@ -2,7 +2,7 @@ package com.niklasarndt.awswatchdog;
 
 import com.niklasarndt.awswatchdog.mail.MailService;
 import com.niklasarndt.awswatchdog.services.AwsWatcher;
-import com.niklasarndt.awswatchdog.util.Configuration;
+import com.niklasarndt.awswatchdog.util.EnvHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executors;
@@ -21,14 +21,12 @@ public class Watchdog {
 
     private ScheduledExecutorService executor;
 
-    public Watchdog() {
-        if (mailer.isInvalid()) {
-            logger.error("Invalid mail service!");
-            System.exit(1);
-        }
-    }
-
     public void start() {
+        if (mailer.isInvalid()) {
+            logger.error("Email configuration is invalid, aborting startup");
+            return;
+        }
+
         if (executor != null && !executor.isShutdown()) {
             logger.info("Shutting down existing executor...");
             executor.shutdown();
@@ -36,7 +34,7 @@ public class Watchdog {
 
         executor = Executors.newScheduledThreadPool(1);
         watcher.setUp();
-        int interval = Configuration.requireInt("POLLING_INTERVAL");
+        int interval = EnvHelper.requireInt("POLLING_INTERVAL");
         logger.info("Setting polling interval to {} seconds (every {} minutes)", interval,
                 interval / 60);
 

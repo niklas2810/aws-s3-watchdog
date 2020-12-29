@@ -1,6 +1,6 @@
 package com.niklasarndt.awswatchdog;
 
-import com.niklasarndt.awswatchdog.util.BuildInfo;
+import com.niklasarndt.awswatchdog.util.BuildConstants;
 import io.sentry.Sentry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ public class Bootstrap {
 
     public static void main(String[] args) {
         logger.info("This is AWS S3 Watchdog v.{} (Build {})",
-                BuildInfo.VERSION, BuildInfo.TIMESTAMP);
+                BuildConstants.VERSION, BuildConstants.TIMESTAMP);
 
         Watchdog service = new Watchdog();
 
@@ -32,8 +32,8 @@ public class Bootstrap {
 
         if (Sentry.isEnabled()) {
             Sentry.configureScope(scope -> {
-                scope.setExtra("App Version", BuildInfo.VERSION);
-                scope.setExtra("App Build Time", BuildInfo.TIMESTAMP);
+                scope.setExtra("App Version", BuildConstants.VERSION);
+                scope.setExtra("App Build Time", BuildConstants.TIMESTAMP);
                 scope.setExtra("Java Vendor", System.getProperty("java.vendor"));
                 scope.setExtra("Java Version", System.getProperty("java.vm.version"));
                 scope.setExtra("Operating System", System.getProperty("os.name"));

@@ -3,7 +3,7 @@ package com.niklasarndt.awswatchdog.services;
 /**
  * Created by Niklas on 2020/12/28.
  */
-public class Constants {
+public class MailConstants {
 
     public static final String MAIL_TEXT = "Hey there!<br><br>" +
             "This is an automated from AWS S3 Watchdog. This message has been sent " +

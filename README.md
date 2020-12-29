@@ -1,4 +1,14 @@
-# Amazon S3 Watchdog
+<div style="width:100%;padding:0px;margin:0px" align="center">
+    <h1>AWS S3 Watchdog</h1>
+    <br>
+    <a href="https://github.com/niklas2810/aws-s3-watchdog/tree/main/java">
+    <img alt="GitHub Actions CI" src="https://img.shields.io/github/workflow/status/niklas2810/aoc-2020/Build%20using%20Maven?logo=github&style=for-the-badge&label=Java%20Build"/>
+    </a>
+     <a href="https://app.codacy.com/gh/niklas2810/aws-s3-watchdog/dashboard">
+        <img alt="Codacy Analysis" src="https://img.shields.io/codacy/grade/2d9dd890a9d74522a875841dbc040142?logo=codacy&style=for-the-badge"/></a>
+    <br>
+    <br>   
+</div>
 
 &copy; Niklas Arndt 2020 via MIT License
 

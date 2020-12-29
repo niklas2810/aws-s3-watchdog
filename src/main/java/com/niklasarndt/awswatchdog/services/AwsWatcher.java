@@ -103,9 +103,6 @@ public class AwsWatcher implements Runnable {
                 items.put(folder, new ArrayList<>(Collections.singletonList(item)));
         }
 
-        items.forEach((key, value) ->
-                value.forEach(val -> System.out.println("\t" + val)));
-
         StringBuilder body = new StringBuilder();
 
         items.forEach((index, subelements) -> {

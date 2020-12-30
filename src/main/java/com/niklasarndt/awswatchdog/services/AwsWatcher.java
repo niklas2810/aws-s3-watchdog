@@ -13,6 +13,7 @@ import com.niklasarndt.awswatchdog.util.EnvHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -134,6 +135,8 @@ public class AwsWatcher implements Runnable {
 
     @Override
     public void run() {
+        waitUntilModFiveSecond();
+
         if (health != null)
             health.sendHeartbeat(HealthchecksClient.EventType.START);
 
@@ -159,5 +162,14 @@ public class AwsWatcher implements Runnable {
 
 
         this.lastCheck = System.currentTimeMillis();
+    }
+
+    private void waitUntilModFiveSecond() {
+        try {
+            while (LocalTime.now().getSecond() % 5 != 0)
+                Thread.sleep(500);
+        } catch (InterruptedException e) {
+            logger.info("(Watchdog has been interrupted while waiting)");
+        }
     }
 }

@@ -16,11 +16,19 @@ public class HealthchecksClient {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String token = EnvHelper.require("HEALTHCHECKS_ID");
 
-    public void sendHeartbeat() {
+    public void start() {
+        sendHeartbeat(EventType.START);
+    }
+
+    public void success() {
         sendHeartbeat(EventType.SUCCESS);
     }
 
-    public void sendHeartbeat(EventType type) {
+    public void fail() {
+        sendHeartbeat(EventType.FAIL);
+    }
+
+    private void sendHeartbeat(EventType type) {
         try {
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
@@ -42,7 +50,7 @@ public class HealthchecksClient {
 
     }
 
-    public enum EventType {
+    private enum EventType {
         SUCCESS(""), FAIL("/fail"), START("/start");
 
         private final String path;

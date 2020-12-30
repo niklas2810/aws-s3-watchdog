@@ -138,7 +138,7 @@ public class AwsWatcher implements Runnable {
         waitUntilModFiveSecond();
 
         if (health != null)
-            health.sendHeartbeat(HealthchecksClient.EventType.START);
+            health.start();
 
         logger.debug("[Routine] Refreshing buckets...");
 
@@ -154,11 +154,11 @@ public class AwsWatcher implements Runnable {
             logger.error("Failed to request bucket objects", e);
             error = true;
             if (health != null)
-                health.sendHeartbeat(HealthchecksClient.EventType.FAIL);
+                health.fail();
         }
 
         if (!error && health != null)
-            health.sendHeartbeat();
+            health.success();
 
 
         this.lastCheck = System.currentTimeMillis();

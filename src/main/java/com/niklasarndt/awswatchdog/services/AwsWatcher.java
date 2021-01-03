@@ -10,6 +10,7 @@ import com.niklasarndt.awswatchdog.mail.MailService;
 import com.niklasarndt.awswatchdog.util.BuildConstants;
 import com.niklasarndt.awswatchdog.util.EnvHelper;
 import com.niklasarndt.healthchecksio.Healthchecks;
+import com.niklasarndt.healthchecksio.HealthchecksClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
@@ -27,7 +28,7 @@ public class AwsWatcher implements Runnable {
 
     private final MailService mailer;
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Healthchecks health = EnvHelper.has("HEALTHCHECKS_ID") ?
+    private final HealthchecksClient health = EnvHelper.has("HEALTHCHECKS_ID") ?
             Healthchecks.forUuid(EnvHelper.require("HEALTHCHECKS_ID")) : null;
 
     private AmazonS3 client;

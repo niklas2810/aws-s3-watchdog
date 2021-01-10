@@ -138,8 +138,13 @@ public class AwsWatcher implements Runnable {
     public void run() {
         waitUntilModFiveSecond();
 
-        if (health != null)
-            health.start();
+        if (health != null) {
+            try {
+                health.start().get();
+            } catch (Exception e) {
+                logger.error("Could not contact healthchecks.io!", e);
+            }
+        }
 
         logger.debug("[Routine] Refreshing buckets...");
 
@@ -154,12 +159,23 @@ public class AwsWatcher implements Runnable {
         } catch (Exception e) {
             logger.error("Failed to request bucket objects", e);
             error = true;
-            if (health != null)
-                health.fail();
+            if (health != null) {
+                try {
+                    health.fail(e.getMessage()).get();
+                } catch (Exception ex) {
+                    logger.error("Could not contact healthchecks.io!", ex);
+                }
+            }
         }
 
-        if (!error && health != null)
-            health.success();
+        if (!error && health != null) {
+            try {
+                health.success().get();
+            } catch (Exception e) {
+                logger.error("Could not contact healthchecks.io!", e);
+            }
+
+        }
 
 
         this.lastCheck = System.currentTimeMillis();

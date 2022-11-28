@@ -6,11 +6,9 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-      day: "saturday"
     target-branch: "develop"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
-      day: "saturday"
     target-branch: "develop"

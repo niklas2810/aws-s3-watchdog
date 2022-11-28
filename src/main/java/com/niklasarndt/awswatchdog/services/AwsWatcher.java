@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.model.ListObjectsV2Result;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.niklasarndt.awswatchdog.mail.MailService;
 import com.niklasarndt.awswatchdog.util.BuildConstants;
+import com.niklasarndt.awswatchdog.util.ByteUnit;
 import com.niklasarndt.awswatchdog.util.EnvHelper;
 import com.niklasarndt.healthchecksio.Healthchecks;
 import com.niklasarndt.healthchecksio.HealthchecksClient;
@@ -87,7 +88,7 @@ public class AwsWatcher implements Runnable {
     private String generateListElement(S3ObjectSummary el) {
         return "<li>" + el.getKey().substring(el.getKey().lastIndexOf("/") + 1) +
                 " (added: " +
-                DATE_FORMAT.format(el.getLastModified()) + ")" + "</li>\n";
+                DATE_FORMAT.format(el.getLastModified()) + ", size: " + ByteUnit.toShortText(el.getSize()) + ")" + "</li>\n";
     }
 
     private void buildMail(String bucketName, List<S3ObjectSummary> added) {
@@ -129,7 +130,7 @@ public class AwsWatcher implements Runnable {
                 .replace("%bucket%", bucketName);
 
         String content = String.format(MailConstants.MAIL_TEXT, bucketName, added.size(),
-                body.toString(), BuildConstants.VERSION, BuildConstants.TIMESTAMP);
+                body, BuildConstants.VERSION, BuildConstants.TIMESTAMP);
 
         mailer.send(subject, content);
     }
